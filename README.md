@@ -1,3 +1,8 @@
+# fork from vfs-http-adapter
+
+fix multipart upload for POST /path to forder/ requests
+use formidable instead of original implementation for parsing forms
+
 # HTTP Adapter
 
 This module is a connect/stack middleware module that wraps a vfs instance and
