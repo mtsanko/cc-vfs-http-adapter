@@ -3,7 +3,7 @@
     "contributors": [
         { "name": "Tim Caswell", "email": "tim@c9.io>" }
     ],
-    "name": "vfs-http-adapter",
+    "name": "cc-vfs-http-adapter",
     "description": "A http middleware to wrap vfs instances and expose them via a RESTful interface",
     "version": "0.2.3",
     "repository": {
