@@ -5,6 +5,27 @@ var Stream = require('stream').Stream;
 var pathJoin = require('path').join;
 var util = require('util');
 
+// node's Readable stream is broken since 10.5 (`end` event is not emited)
+var readableStream = require('readable-stream');
+
+var formidableStream = function (form, part) {
+  var partStream = new readableStream.Readable();
+
+  partStream.wrap({
+    on: function (event, callback) {
+      if (event === 'data' || event === 'end') {
+        part.addListener.call(part, event, callback);
+      } else {
+        form.addListener.call(form, event, callback);
+      }
+    },
+    pause: form.pause.bind(form),
+    resume: form.resume.bind(form)
+  });
+
+  return partStream;
+};
+
 module.exports = function setup(mount, vfs, mountOptions) {
 
   if (!mountOptions) mountOptions = {};
@@ -212,15 +233,14 @@ module.exports = function setup(mount, vfs, mountOptions) {
           files = [],
           fields = [];
 
-        form.uploadDir = path + "/";
-        form.onPart = function(part) {
+         form.onPart = function(part) {
           if (!part.filename) {
             // let formidable handle all non-file parts
             form.handlePart(part);
           } else {
             console.log(part);
 
-            var partStream = require('formidable-stream')(form, part);
+            var partStream = formidableStream(form, part);
             vfs.mkfile(path + "/" + part.filename, {stream:partStream}, function (err, meta) {
               if (err) return abort(err);
             });
@@ -228,19 +248,20 @@ module.exports = function setup(mount, vfs, mountOptions) {
         }
         form
           .on('field', function(field, value) {
-            console.log(field, value);
+            //console.log(field, value);
             fields.push([field, value]);
           })
           .on('file', function(field, file) {
-            console.log(field, file);
+            //console.log(field, file);
             files.push([field, file]);
           })
           .on('end', function() {
-            console.log('-> upload done');
-            res.writeHead(200, {'content-type': 'text/plain'});
-            res.write('received fields:\n\n '+util.inspect(fields));
-            res.write('\n\n');
-            res.end('received files:\n\n '+util.inspect(files));
+//            console.log('-> upload done');
+//            res.writeHead(200, {'content-type': 'text/plain'});
+//            res.write('received fields:\n\n '+util.inspect(fields));
+//            res.write('\n\n');
+//            res.end('received files:\n\n '+util.inspect(files));
+            res.end();
           });
         form.parse(req);
 //          vfs.mkfile(path + "/" + filename, {stream:stream}, function (err, meta) {
