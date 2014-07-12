@@ -233,45 +233,36 @@ module.exports = function setup(mount, vfs, mountOptions) {
           files = [],
           fields = [];
 
-         form.onPart = function(part) {
+        form.onPart = function(part) {
           if (!part.filename) {
             // let formidable handle all non-file parts
             form.handlePart(part);
           } else {
-            console.log(part);
-
             var partStream = formidableStream(form, part);
             vfs.mkfile(path + "/" + part.filename, {stream:partStream}, function (err, meta) {
               if (err) return abort(err);
             });
           }
-        }
+        };
+
         form
+          .on('error', function(err) {
+            return abort(err);
+          })
+          .on('aborted', function() {
+          })
           .on('field', function(field, value) {
-            //console.log(field, value);
             fields.push([field, value]);
           })
           .on('file', function(field, file) {
-            //console.log(field, file);
             files.push([field, file]);
           })
           .on('end', function() {
-//            console.log('-> upload done');
-//            res.writeHead(200, {'content-type': 'text/plain'});
-//            res.write('received fields:\n\n '+util.inspect(fields));
-//            res.write('\n\n');
-//            res.end('received files:\n\n '+util.inspect(files));
             res.end();
           });
+
         form.parse(req);
-//          vfs.mkfile(path + "/" + filename, {stream:stream}, function (err, meta) {
-//            if (err) return abort(err);
-//          });
-//        });
-//        parser.on("error", abort);
-//        parser.on("end", function () {
-//          res.end();
-//        });
+
         return;
       }
 

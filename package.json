@@ -15,7 +15,8 @@
   },
   "main": "restful.js",
   "dependencies": {
-    "formidable": "^1.0.15"
+    "formidable": "^1.0.15",
+    "readable-stream": "^1.0.27-1"
   },
   "devDependencies": {
     "vfs-local": "^0.3.13"
