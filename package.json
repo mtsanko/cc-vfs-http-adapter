@@ -1,26 +1,11 @@
 {
   "author": "Ajax.org B.V. <info@ajax.org>",
   "contributors": [
-    { "name": "Tim Caswell", "email": "tim@c9.io>" }
+    {
+      "name": "Tim Caswell",
+      "email": "tim@c9.io>"
+    }
   ],
-  "name": "cc-vfs-http-adapter",
-  "description": "A http middleware to wrap vfs instances and expose them via a RESTful interface",
-  "version": "0.2.3",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/mtsanko/cc-vfs-http-adapter.git"
-  },
-  "main": "restful.js",
-  "dependencies": {},
-  "devDependencies": {},
-  "optionalDependencies": {},
-  "licenses" : [{
-    "type" : "MIT",
-    "url" : "http://github.com/mtsanko/cc-vfs-http-adapter/raw/master/LICENSE"
-  }],
-  "engines": {
-    "node": "*"
-  },
   "name": "cc-vfs-http-adapter",
   "description": "A http middleware to wrap vfs instances and expose them via a RESTful interface",
   "version": "0.2.3",
@@ -30,9 +15,12 @@
   },
   "main": "restful.js",
   "dependencies": {
-    "formidable": "^1.0.15"
+    "formidable": "^1.0.15",
+    "formidable-stream": "^0.1.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "vfs-local": "^0.3.13"
+  },
   "optionalDependencies": {},
   "licenses": [
     {

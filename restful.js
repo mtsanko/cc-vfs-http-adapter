@@ -1,7 +1,9 @@
 var urlParse = require('url').parse;
-var multipart = require('./multipart');
+//var multipart = require('./multipart');
+var formidable= require('formidable');
 var Stream = require('stream').Stream;
 var pathJoin = require('path').join;
+var util = require('util');
 
 module.exports = function setup(mount, vfs, mountOptions) {
 
@@ -206,40 +208,49 @@ module.exports = function setup(mount, vfs, mountOptions) {
     else if (req.method === "POST") {
 
       if (path[path.length - 1] === "/") {
-        var contentType = req.headers["content-type"];
-        if (!contentType) {
-          return abort(new Error("Missing Content-Type header"), 400);
-        }
-        if (!(/multipart/i).test(contentType)) {
-          return abort(new Error("Content-Type should be multipart"), 400);
-        }
-        var match = contentType.match(/boundary=(?:"([^"]+)"|([^;]+))/i);
-        if (!match) {
-          return abort(new Error("Missing multipart boundary"), 400);
-        }
-        var boundary = match[1] || match[2];
+        var form = new formidable.IncomingForm(),
+          files = [],
+          fields = [];
 
-        var parser = multipart(req, boundary);
+        form.uploadDir = path + "/";
+        form.onPart = function(part) {
+          if (!part.filename) {
+            // let formidable handle all non-file parts
+            form.handlePart(part);
+          } else {
+            console.log(part);
 
-        parser.on("part", function (stream) {
-          var contentDisposition = stream.headers["content-disposition"];
-          if (!contentDisposition) {
-            return parser.error("Missing Content-Disposition header in part");
+            var partStream = require('formidable-stream')(form, part);
+            vfs.mkfile(path + "/" + part.filename, {stream:partStream}, function (err, meta) {
+              if (err) return abort(err);
+            });
           }
-          var match = contentDisposition.match(/filename="([^"]*)"/);
-          if (!match) {
-            return parser.error("Missing filename in Content-Disposition header in part");
-          }
-          var filename = match[1];
-
-          vfs.mkfile(path + "/" + filename, {stream:stream}, function (err, meta) {
-            if (err) return abort(err);
+        }
+        form
+          .on('field', function(field, value) {
+            console.log(field, value);
+            fields.push([field, value]);
+          })
+          .on('file', function(field, file) {
+            console.log(field, file);
+            files.push([field, file]);
+          })
+          .on('end', function() {
+            console.log('-> upload done');
+            res.writeHead(200, {'content-type': 'text/plain'});
+            res.write('received fields:\n\n '+util.inspect(fields));
+            res.write('\n\n');
+            res.end('received files:\n\n '+util.inspect(files));
           });
-        });
-        parser.on("error", abort);
-        parser.on("end", function () {
-          res.end();
-        });
+        form.parse(req);
+//          vfs.mkfile(path + "/" + filename, {stream:stream}, function (err, meta) {
+//            if (err) return abort(err);
+//          });
+//        });
+//        parser.on("error", abort);
+//        parser.on("end", function () {
+//          res.end();
+//        });
         return;
       }
 
