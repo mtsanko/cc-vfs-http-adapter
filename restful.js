@@ -239,7 +239,10 @@ module.exports = function setup(mount, vfs, mountOptions) {
             form.handlePart(part);
           } else {
             var partStream = formidableStream(form, part);
-            vfs.mkfile(path + "/" + part.filename, {stream:partStream}, function (err, meta) {
+            vfs.mkfile(path + "/" + part.filename, {
+              stream:partStream,
+              parents:true
+            }, function (err, meta) {
               if (err) return abort(err);
             });
           }
