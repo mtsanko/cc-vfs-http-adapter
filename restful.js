@@ -214,16 +214,17 @@ module.exports = function setup(mount, vfs, mountOptions) {
     } // end PUT request
 
     else if (req.method === "DELETE") {
-      var command;
       if (path[path.length - 1] === "/") {
-        command = vfs.rmdir;
+        vfs.rmdir(path, {recursive: req.query.reqursive !== undefined}, function (err, meta) {
+          if (err) return abort(err);
+          res.end();
+        });
       } else {
-        command = vfs.rmfile;
+        vfs.file(path, {}, function (err, meta) {
+          if (err) return abort(err);
+          res.end();
+        });
       }
-      command(path, {}, function (err, meta) {
-        if (err) return abort(err);
-        res.end();
-      });
     } // end DELETE request
 
     else if (req.method === "POST") {
