@@ -59,7 +59,8 @@ Delete a file.
 ## `DELETE /directory/path/with/slash/`
 
 Delete a directory (not recursive)
-
+DELETE accepts reqursive parameter for directories
+## `DELETE /directory/path/with/slash/?reqursive`
 
 ## `POST /path/to/target`
 
