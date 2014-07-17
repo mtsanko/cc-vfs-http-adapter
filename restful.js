@@ -220,7 +220,7 @@ module.exports = function setup(mount, vfs, mountOptions) {
           res.end();
         });
       } else {
-        vfs.file(path, {}, function (err, meta) {
+        vfs.rmfile(path, {}, function (err, meta) {
           if (err) return abort(err);
           res.end();
         });
